@@ -1,0 +1,178 @@
+---
+title: "Project1- better understand and predict the retail price of a vehicle using various attributes. "
+author: "Lola Awodipe"
+date: "1/29/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+Cars <- read.csv(file.choose(), header= TRUE)
+head(Cars)
+dim(Cars)
+names(Cars)
+
+#Original analyses from looking at the data.
+##change column names, change to factors
+##luxury, performance set to a number
+## market.category, driven_wheel, model, engine.fuel/type, Model
+
+##The column names are either too much or not enough.  Change the column names so that they do not have ##spaces, underscores, slashes, and the like. All column names should be under 12 characters. Make sure ##you're updating your codebook with information on the tidied data set as well.
+
+names(Cars) <- c("Make","Model","Year","Engine_Fuel_type","Engine_HP","Engine_Cylinders","Trans_Type",
+"Driven_Wheels","No_Of_Doors","Market_Category","Vehicle_Size","Vehicle_Style",
+"Highway_MPG","City_MPG","Popularity","MSRP")
+
+
+#changed variable names
+names(Cars)
+
+library(dplyr)
+#Get an Idea of the current format of the colums we are currently using.
+
+glimpse(Cars)
+
+#check for NAs
+
+any(is.na(Cars))
+
+#inspecting the different factor levels of variables of interest
+unique(Cars$Model) #too many variables 
+unique(Cars$Make)
+unique(Cars$Engine_Fuel_type)
+unique(Cars$Trans_Type)
+unique(Cars$Driven_Wheels)
+unique(Cars$Market_Category) #too complex has more than one variables.
+unique(Cars$Vehicle_Size)
+unique(Cars$Vehicle_Style)
+unique(Cars$Popularity)
+
+# Factor appropriate columns 
+Cars$Model <- as.factor(Cars$Model)
+Cars$Make <-as.factor(Cars$Make)
+Cars$Engine_Fuel_type <- as.factor(Cars$Engine_Fuel_type)
+Cars$Trans_Type<- as.factor(Cars$Trans_Type)
+Cars$Driven_Wheels <- as.factor(Cars$Driven_Wheels)
+Cars$Vehicle_Size <- as.factor(Cars$Vehicle_Size)
+Cars$Vehicle_Style <- as.factor(Cars$Vehicle_Style)
+
+#View data
+
+glimpse(Cars)
+
+
+# EDA on the following
+# histogram of Vehicle Size, 
+# popularity and car the bar plot
+# the highest Make of cars
+
+
+library(knitr)
+library(kableExtra)
+Desc_Stats <- c("min", "max", "mean", "sd")
+Popularity <- c(min(Cars$Popularity), mean(Cars$Popularity), sd(Cars$Popularity), max(Cars$Popularity))
+Doors <- c(min(Cars$No_Of_Doors), mean(Cars$No_Of_Door),sd(Cars$No_Of_Doors), max(Cars$No_Of_Doors))
+MSRP <- c(min(Cars$MSRP), mean(Cars$MSRP), sd(Cars$MSRP) ,max(Cars$MSRP))
+CityMPG <- c(min(Cars$City_MPG), mean(Cars$City_MPG), sd(Cars$City_MPG), max(Cars$City_MPG))
+HighwayMPG <- c(min(Cars$Highway_MPG), mean(Cars$Highway_MPG), sd(Cars$Highway_MPG), max(Cars$Highway_MPG))
+
+
+hist(talentData$HourlyRate, col = "darkred", xlab="Hourly Rate", main="Histogram of Hourly Rate")
+hist(Cars$Popularity, col ="darkred", xlab="Popularity", main = "Popularity of Cars")
+
+hist(Cars$No_of_Doors, col= "darkred",xlab="Doors", main = "Number of Doors")
+
+hist(Cars$MSRP, col="darkred", xlab ="MSRP", main = "MSRP")
+
+library(ggplot2)
+
+Types <-Cars[,c("Vehicle_style", "Vehicle_Size", "Popularity")
+
+
+ggplot(Cars,aes(Cars$Make)) +
+  geom_bar(aes(fill=Popularity), width = 0.5) +
+  labs(title = "Make by Popularity",
+       subtitle = "Popularity of Car Makes",
+       x = "Make",
+       y = "Frequency") +
+  coord_flip()
+  
+  ggplot(Cars,aes(Cars$Vehicle_Style)) +
+  geom_bar(aes(fill=Popularity), width = 0.5) +
+  labs(title = "Make by Popularity",
+       subtitle = "Popularity of Car Makes",
+       x = "Make",
+       y = "Frequency") +
+  coord_flip()
+  
+
+
+theme_set(theme_light())
+ggplot(Cars, aes(x =Year, y = Model )) +
+  ggtitle("Years at Company vs Age") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  labs(x= "Year", y = "Model") +
+  geom_point(shape=1, col = "purple") +
+  geom_smooth(method = "gam")
+  
+  
+
+cor.test (x=Cars$Year, y = Cars$Popularity,
+         alternative = "two.sided",
+         method="pearson",
+         conf.level = 0.95,
+         exact = TRUE)
+
+ggplot(talentData, aes(YrsAtCompany)) +
+  geom_density(aes(fill=JobSatfctn), alpha=0.8) +
+  labs(title= "Years At the Company Density Plot",
+       subtitle="Years at the Company grouped by Job Satisfaction",
+       x="Years at Company",
+       y="Density")
+       
+ggplot(Cars, aes(Highway_MPG)) +
+  geom_density(aes(fill=Make), alpha = 0.8) +
+  labs(title= "Highway MPG Density PLOT by Make",
+       subtitle="Highway MPG by Make",
+       x="Highway MPG     ",
+       y="Density")
+
+library(ggcorrplot)
+
+continuous_vars <- Cars[c("Year","Engine_Cylinders","No_of_Doors","Highway_MPG")]
+                                  
+correlations <- round(cor(continuous_vars), 1)
+
+ggcorrplot(correlations, hc.order = TRUE,
+           type = "lower",
+           lab = TRUE,
+           lab_size = 4,
+           method="circle",
+           colors= c("tomato2", "white", "springgreen3"),
+           title = "Correlation Chart For TalentData",
+           ggtheme=theme_bw)
+
+
